@@ -2,6 +2,8 @@ use ascii::{AsciiString, AsciiStr, FromAsciiError};
 use std::fmt::{self, Display, Formatter};
 use std::str::{FromStr};
 use std::cmp::Ordering;
+use std::convert::TryInto;
+use std::time::SystemTime;
 
 use chrono::*;
 
@@ -422,7 +424,10 @@ pub struct HTTPDate {
 
 impl HTTPDate {
     pub fn new() -> HTTPDate {
-        HTTPDate {d: Utc::now(),}
+        let duration = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .expect("SystemTime before UNIX EPOCH!");
+        HTTPDate {d: Utc.timestamp(duration.as_secs().try_into().unwrap(), duration.subsec_nanos()),}
     }
 }
 
